@@ -23,7 +23,7 @@ Note: If you are upgrading from 5.7 to 8.0, please ensure that you read the `upg
 Features Removed in Percona Server for MySQL 8.0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  Slow Query Log Rotation and Expiration
+-  Slow Query Log Rotation and Expiration: Not widely used, can be accomplished using ``logrotate``
 -  CSV engine mode for standard-compliant quote and comma parsing
 -  Expanded program option modifiers
 -  The ``ALL_O_DIRECT`` InnoDB flush method: it is not compatible with the
@@ -46,34 +46,20 @@ Improvements
 Bugs Fixed Since 8.0.12-rc1
 ================================================================================
 
--  Changed the way that General Tablespace Encryption feature registers
-   with the data dictionary to enable clean upgrades from PS 5.7 to PS
-   8.0.13 :psbug:`5151`
--  Rewrite Binlog Encryption after MySQL 8.0.13 merge due to `WL#10956 <https://dev.mysql.com/worklog/task/?id=10956>`__
-   that changed binlog access APIs :psbug:`5105`
 -  Disabled the variables for Expanded Fast Index Creation since the
    feature is not yet re-implemented :psbug:`5195`
--  Fixed a crash bug on some simple SQL queries in TokuDB :psbug:`5163`
--  Fixed a memory leak in ``mysqldump`` in the ``--innodb-optimize-keys`` 
-   functionality :psbug:`5144`
 -  Fixed a crash in ``mysqldump`` in the ``--innodb-optimize-keys``
    functionality :psbug:`4972`
 -  Fixed a crash that can occur when system tables are locked by the
    user due to a ``lock_wait_timeout`` :psbug:`5134`
 -  Fixed a crash that can occur when system tables are locked by the
    user from a ``SELECT FOR UPDATE`` statement :psbug:`5027`
--  Fixed a bug that would prevent upgrading from PS 5.7 to PS 8.0 if you
-   had bootstrapped your datadir with ``--innodb-encrypt-tables`` :psbug:`5117`
 -  Fixed a bug that caused ``innodb_buffer_pool_size`` to be
    uninitialized after a restart if it was set using ``SET PERSIST`` :psbug:`5069`
 -  Fixed a crash in TokuDB that can occur when a temporary table
    experiences an autoincrement rollover :psbug:`5056`
 -  Fixed a bug where marking an index as invisible would cause a table
    rebuild in TokuDB and also in MyRocks :psbug:`5031`
--  Fixed a crash under some conditions when using the ``VARBINARY`` data
-   type in a table. :psbug:`5025`
--  Fixed a crash that would occur when querying PFS metadata locks table
-   after ``FLUSH TABLE WITH READ LOCK`` :psbug:`4977`
 -  Fixed a bug where audit logs could get corrupted if the
    ``audit_log_rotations`` was changed during runtime. :psbug:`4950`
 -  Fixed a bug where ``LOCK INSTANCE FOR BACKUP`` and
@@ -82,10 +68,8 @@ Bugs Fixed Since 8.0.12-rc1
 
 Other Bugs Fixed:
 
-:psbug:`5155`, :psbug:`5140`, :psbug:`5139`, :psbug:`5120`, :psbug:`5108`, :psbug:`5091`,
-:psbug:`5057`, :psbug:`5049`, :psbug:`5041`, :psbug:`5016`, :psbug:`4999`, :psbug:`4971`,
-:psbug:`4943`, :psbug:`4926`, :psbug:`4920`, :psbug:`4918`, :psbug:`4917`, :psbug:`4898`,
-:psbug:`4796`, :psbug:`5147`, :psbug:`5180`, and :psbug:`4744`.
+:psbug:`5155`, :psbug:`5139`, :psbug:`5057`, :psbug:`5049`, :psbug:`4999`, :psbug:`4971`,
+:psbug:`4943`, :psbug:`4918`, :psbug:`4917`, :psbug:`4898`, and :psbug:`4744`.
 
 Known Issues
 ================================================================================
@@ -106,13 +90,10 @@ Notable Issues in Features
 
 -  :psbug:`5148`: Regression in Compressed Columns Feature when using ``innodb-force-recovery``
 -  :psbug:`4996`: Regression in User Statistics feature where ``TOTAL_CONNECTIONS`` field report incorrect data
--  :psbug:`4933`: Regression in Slow Query Logging Extensions feature where incorrect transaction id
-   accounting can cause an assert during certain DDLs.
--  :psbug:`5206`: TokuDB: A crash can occur in TokuDB when using Native Partioning and the optimizer 
-    has ``index_merge_union`` enabled. Workaround by using ``SET SESSION optimizer_switch="index_merge_union=off";``
+-  :psbug:`4933`: Regression in  Slow Query Logging Extensions feature where incorrect transaction idaccounting can cause an assert during certain DDLs.
+-  :psbug:`5206`: TokuDB: A crash can occur in TokuDB when using Native Partioning and the optimizer has ``index_merge_union`` enabled. Workaround by using ``SET SESSION optimizer_switch="index_merge_union=off";``
 -  :psbug:`5174`: MyRocks: Attempting to use unsupported features against MyRocks can lead to a crash rather than an error.
--  :psbug:`5024`: MyRocks: Queries can return the wrong results on tables with no primary key, non-unique
-    ``CHAR``/``VARCHAR`` rows, and ``UTF8MB4`` charset.
+-  :psbug:`5024`: MyRocks: Queries can return the wrong results on tables with no primary key, non-unique ``CHAR``/``VARCHAR`` rows, and ``UTF8MB4`` charset.
 -  :psbug:`5045`: MyRocks: Altering a column or table comment cause the table to be rebuilt
 
 Find the release notes for Percona Server for MySQL 8.0.13-3 in our online documentation. Report bugs in the Jira bug tracker.
